@@ -1,24 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {  useEffect, useState  } from 'react';
+import Login from './components/Login/Login';
+import MainHeader from './components/MainHeader/MainHeader';
+import Timer from './components/Timer/Timer';
+import Users from './components/Users/Users';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isShowUser, setShowUsers] = useState(false)
+  const [showTimer,setShowTimer] = useState(false)
+
+  const showUsersHandler = () => {
+    setShowUsers(true)
+    setShowTimer(false)  
+  }
+
+
+  const showTimerHandler = () =>{
+      setShowTimer(true)
+      setShowUsers(false)
+  }
+
+  useEffect(()=>{
+    const result = localStorage.getItem("isLoggedIn")
+    setIsLoggedIn(!!result)
+  },[])
+
+
+  const loginHandler = () => {
+    localStorage.setItem("isLoggedIn", "1");
+    setIsLoggedIn(true);
+  };
+  const logoutHandler = () => {
+    localStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+  };
+
+  const first = isLoggedIn && isShowUser
+  const second = showTimer && isLoggedIn
+  const third = !showTimer && !isShowUser && isLoggedIn
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+       <MainHeader showTimerHandler={showTimerHandler} showUsersHandler={showUsersHandler}  isAuthenticated={isLoggedIn} onLogout={logoutHandler}/>
+      <main>
+        {!isLoggedIn && <Login onLogin={loginHandler} />}
+        {third && <Users/>}
+        {first && <Users/>}
+        {second && <Timer/>}
+      </main>
+    </React.Fragment>
   );
 }
 
